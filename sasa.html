@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" id="themeColor" content="#e8edf3">
+<link rel="manifest" href="manifest.json">
+<title>AI Asistent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#e8edf3;--tx:#2a3a4a;--tx2:#2a3a4a55;--ac:#00c8b4;
+  --sh-x:6px;--sh-y:6px;--sh-b:14px;
+  --sh-dark:#b8c5d0;--sh-light:#ffffff;
+  --r:18px;--r2:12px;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;transition:background .3s,color .3s}
+.c{background:var(--bg);box-shadow:var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-dark),calc(var(--sh-x)*-1) calc(var(--sh-y)*-1) var(--sh-b) var(--sh-light);border-radius:var(--r)}
+.i{background:var(--bg);box-shadow:inset var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-dark),inset calc(var(--sh-x)*-1) calc(var(--sh-y)*-1) var(--sh-b) var(--sh-light);border-radius:var(--r2)}
+.b{background:var(--bg);box-shadow:calc(var(--sh-x)*.7) calc(var(--sh-y)*.7) calc(var(--sh-b)*.7) var(--sh-dark),calc(var(--sh-x)*-.7) calc(var(--sh-y)*-.7) calc(var(--sh-b)*.7) var(--sh-light);border-radius:50px;border:none;cursor:pointer;color:var(--tx);font-family:inherit;transition:all .2s}
+.b:active{box-shadow:inset var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-dark),inset calc(var(--sh-x)*-1) calc(var(--sh-y)*-1) var(--sh-b) var(--sh-light)}
+input,textarea,select{background:var(--bg);box-shadow:inset var(--sh-x) var(--sh-y) var(--sh-b) var(--sh-dark),inset calc(var(--sh-x)*-1) calc(var(--sh-y)*-1) var(--sh-b) var(--sh-light);border-radius:var(--r2);border:none;color:var(--tx);font-family:inherit;outline:none;width:100%;padding:10px 14px;font-size:13px}
+input::placeholder,textarea::placeholder{color:var(--tx2)}
+#wrap{max-width:480px;margin:0 auto;padding:0 0 130px}
+.hdr{padding:16px 16px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.clk{font-size:28px;font-weight:900;letter-spacing:-1px}
+.dbar{padding:6px 16px 4px;font-size:12px;font-weight:700;color:var(--ac);text-transform:capitalize}
+.tabs{display:inline-flex;gap:2px;padding:5px 7px}
+.tb{padding:7px 13px;font-size:12px;font-weight:700;border-radius:50px;border:none;cursor:pointer;font-family:inherit;background:transparent;box-shadow:none;color:var(--tx2);transition:all .2s;display:flex;align-items:center;gap:6px}
+.tb.on{background:var(--bg);box-shadow:calc(var(--sh-x)*.7) calc(var(--sh-y)*.7) calc(var(--sh-b)*.7) var(--sh-dark),calc(var(--sh-x)*-.7) calc(var(--sh-y)*-.7) calc(var(--sh-b)*.7) var(--sh-light);color:var(--ac)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 12px 0}
+.col{display:flex;flex-direction:column;gap:12px}
+.sec{padding:13px 11px}
+.st{font-size:12px;font-weight:800;margin-bottom:9px;color:var(--tx);display:flex;align-items:center;gap:7px}
+.ri{padding:7px 9px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.bdg{border-radius:10px;min-width:22px;height:22px;padding:0 6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;background:#e94444}
+.tg{padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800;color:#fff;white-space:nowrap}
+.tli{padding:6px 9px;margin-bottom:4px;border-radius:0 10px 10px 0;border-left-width:3px;border-left-style:solid}
+/* ICON BOX */
+.ib{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);box-shadow:3px 3px 7px var(--sh-dark),-3px -3px 7px var(--sh-light)}
+/* MIC */
+.mw{position:relative;display:inline-block}
+.mbig{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;position:relative;z-index:1;background:var(--bg);box-shadow:calc(var(--sh-x)*1.4) calc(var(--sh-y)*1.4) calc(var(--sh-b)*1.4) var(--sh-dark),calc(var(--sh-x)*-1.4) calc(var(--sh-y)*-1.4) calc(var(--sh-b)*1.4) var(--sh-light)}
+.mbig.on{background:linear-gradient(135deg,var(--ac),#00a896)!important;box-shadow:0 0 28px #00c8b488,0 0 56px #00c8b433!important;animation:gp 1.5s ease-in-out infinite}
+.msm{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;background:var(--bg);box-shadow:calc(var(--sh-x)*.8) calc(var(--sh-y)*.8) calc(var(--sh-b)*.8) var(--sh-dark),calc(var(--sh-x)*-.8) calc(var(--sh-y)*-.8) calc(var(--sh-b)*.8) var(--sh-light)}
+.msm.on{background:linear-gradient(135deg,var(--ac),#00a896)!important;box-shadow:0 0 18px #00c8b488!important}
+@keyframes pr{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.8);opacity:0}}
+@keyframes gp{0%,100%{box-shadow:0 0 18px #00c8b433}50%{box-shadow:0 0 32px #00c8b477,0 0 56px #00c8b433}}
+@keyframes si{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes wv{0%,100%{height:4px}50%{height:20px}}
+.pr{position:absolute;inset:-8px;border-radius:50%;pointer-events:none}
+.pr span{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(0,220,200,.4);animation:pr 1.8s ease-out infinite}
+.pr span:nth-child(2){animation-delay:.6s}.pr span:nth-child(3){animation-delay:1.2s}
+.wb{width:3px;border-radius:3px;background:linear-gradient(to top,var(--ac),#00e8d0);transition:height .12s ease}
+.bbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg);box-shadow:0 -3px 18px var(--sh-dark);border-radius:22px 22px 0 0;padding:12px 18px 26px;display:flex;justify-content:space-between;align-items:center;z-index:200}
+.fab{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.fg{display:flex;gap:12px}
+.sbar{position:fixed;bottom:106px;left:50%;transform:translateX(-50%);z-index:150;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+.sbar.show{opacity:1}
+.si2{padding:7px 18px;border-radius:50px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--ac)}
+.tgl{width:44px;height:25px;border-radius:13px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0}
+.tgl-k{position:absolute;top:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.pnl{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+.ph{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.cm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:10px 13px;border-radius:18px;font-size:13px;line-height:1.5;animation:si .2s ease;word-break:break-word}
+.msg.u{align-self:flex-end;background:linear-gradient(135deg,var(--ac),#00a896);color:#fff;border-radius:18px 18px 4px 18px}
+.msg.a{align-self:flex-start;background:var(--bg);box-shadow:calc(var(--sh-x)*.6) calc(var(--sh-y)*.6) calc(var(--sh-b)*.6) var(--sh-dark),calc(var(--sh-x)*-.6) calc(var(--sh-y)*-.6) calc(var(--sh-b)*.6) var(--sh-light);border-radius:18px 18px 18px 4px}
+.cib{padding:10px 14px 20px;flex-shrink:0}
+.dots{display:flex;gap:6px;padding:10px 13px;align-self:flex-start}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ac);animation:wv .8s ease infinite alternate}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+input[type=range]{-webkit-appearance:none;height:6px;border-radius:3px;outline:none;box-shadow:none;background:linear-gradient(to right,var(--ac) var(--val,50%),var(--sh-dark) var(--val,50%));padding:0;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--bg);cursor:pointer;box-shadow:3px 3px 6px var(--sh-dark),-3px -3px 6px var(--sh-light);border:2px solid var(--ac)}
+input[type=color]{width:100%;height:38px;border-radius:10px;border:none;padding:3px;cursor:pointer}
+#offbadge{position:fixed;top:8px;right:8px;background:#ff6644;color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;z-index:999;display:none}
+.sw{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .2s}
+.sw:active{transform:scale(.9)}
+.qbtn{flex:1;padding:11px 4px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:5px}
+</style>
+</head>
+<body>
+<div id="offbadge">OFFLINE</div>
+<div id="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <div class="c tabs" id="tabbar">
+        <button class="tb on" data-t="pregled">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Pregled
+        </button>
+        <button class="tb" data-t="beleske">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Beleske
+        </button>
+        <button class="tb" data-t="alarmi">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/></svg>
+          Alarmi
+        </button>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div class="clk" id="clk">00:00</div>
+      <div style="font-size:11px;color:var(--tx2);font-weight:600" id="uname-lbl">Sasa</div>
+    </div>
+  </div>
+  <div class="dbar" id="dbar"></div>
+
+  <!-- PREGLED -->
+  <div id="tp">
+    <div class="g2">
+      <div class="col">
+        <div class="c sec">
+          <div class="st">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Beleske
+          </div>
+          <div id="nw"></div>
+        </div>
+        <div class="c sec">
+          <div class="st">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/></svg>
+            Alarmi
+          </div>
+          <div id="aw"></div>
+        </div>
+        <div class="c sec">
+          <div class="st">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Termini
+          </div>
+          <div id="emi"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="c sec">
+          <div class="st">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Plan dana
+          </div>
+          <div id="tl"></div>
+        </div>
+        <div class="c sec">
+          <div class="st">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            To-Do
+          </div>
+          <div id="tdl"></div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <input id="tdi" placeholder="Dodaj..." style="font-size:11px;padding:7px 10px">
+            <button class="b" onclick="addTd()" style="padding:7px 11px;color:var(--ac)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- MIC BOX -->
+        <div class="c sec" style="text-align:center">
+          <div style="font-size:11px;color:var(--tx2);font-style:italic;min-height:30px;line-height:1.4;margin-bottom:10px" id="aibox">Pritisni mikrofon!</div>
+          <div class="mw" style="display:inline-block">
+            <div class="pr" id="pm" style="display:none"><span></span><span></span><span></span></div>
+            <button class="msm" id="mm" onclick="togMic()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+          <div style="font-size:10px;margin-top:6px;font-weight:700;color:var(--tx2)" id="mml">Pritisni za govor</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;padding:12px 12px 0">
+      <button class="b qbtn" onclick="sw('beleske')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span>Beleska</span>
+      </button>
+      <button class="b qbtn" onclick="sw('alarmi')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/></svg>
+        <span>Alarm</span>
+      </button>
+      <button class="b qbtn" onclick="sw('termini')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        <span>Termin</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BELESKE -->
+  <div id="tb" style="display:none;padding:12px">
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Nova Beleska
+      </div>
+      <input id="nt" placeholder="Naziv beleske..." style="margin-bottom:8px">
+      <textarea id="ni" placeholder="Stavke (svaka u novom redu)..." rows="3" style="padding:10px 14px;font-size:12px;resize:none;margin-bottom:8px"></textarea>
+      <button class="b" onclick="addN()" style="width:100%;padding:11px;font-size:13px;font-weight:700;color:var(--ac);display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Sacuvaj
+      </button>
+    </div>
+    <div id="nf"></div>
+  </div>
+
+  <!-- ALARMI -->
+  <div id="ta" style="display:none;padding:12px">
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/></svg>
+        Novi Alarm
+      </div>
+      <input id="al" placeholder="Naziv alarma..." style="margin-bottom:8px">
+      <input type="time" id="at" style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <label style="font-size:12px;font-weight:700;color:var(--tx2);white-space:nowrap">Ponavljanje</label>
+        <select id="arep" style="flex:1;font-size:12px">
+          <option value="none">Jednom</option>
+          <option value="daily">Svaki dan</option>
+          <option value="weekdays">Radni dani</option>
+          <option value="weekend">Vikend</option>
+        </select>
+      </div>
+      <button class="b" onclick="addA()" style="width:100%;padding:11px;font-size:13px;font-weight:700;color:var(--ac);display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+        Postavi Alarm
+      </button>
+    </div>
+    <div id="af"></div>
+  </div>
+
+  <!-- TERMINI -->
+  <div id="tt" style="display:none;padding:12px">
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Novi Termin
+      </div>
+      <input id="et" placeholder="Naziv termina..." style="margin-bottom:8px">
+      <input type="date" id="ed" style="margin-bottom:8px">
+      <input type="time" id="etm" style="margin-bottom:8px">
+      <input id="eloc" placeholder="Lokacija (opciono)..." style="margin-bottom:8px">
+      <button class="b" onclick="addEv()" style="width:100%;padding:11px;font-size:13px;font-weight:700;color:var(--ac);display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        Dodaj Termin
+      </button>
+    </div>
+    <div id="ef"></div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bbar">
+  <div class="fg">
+    <button class="b fab" onclick="sw('pregled');clPnl()" style="color:var(--ac)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </button>
+    <button class="b fab" id="cfab" onclick="togChat()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+  </div>
+  <div class="mw">
+    <div class="pr" id="pM" style="display:none"><span></span><span></span><span></span></div>
+    <button class="mbig" id="mM" onclick="togMic()">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="mic-svg"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+  </div>
+  <div class="fg">
+    <button class="b fab" id="afab" onclick="togAuto()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="auto-svg"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    </button>
+    <button class="b fab" onclick="togSet()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- STATUS -->
+<div class="sbar" id="sb">
+  <div class="c si2"><div id="ws" style="display:flex;gap:3px;align-items:center"></div><span id="st2">...</span></div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="pnl" id="cp" style="display:none">
+  <div class="ph c" style="border-radius:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="ib" style="background:linear-gradient(135deg,var(--ac),#00a896)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8" cy="11" r="2"/><circle cx="16" cy="11" r="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><line x1="12" y1="16" x2="12" y2="16" stroke-width="3"/></svg>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:900">AI Asistent</div>
+        <div style="font-size:11px;color:var(--ac);font-weight:700" id="csub">Normal · Manual</div>
+      </div>
+    </div>
+    <button class="b" onclick="togChat()" style="padding:8px 13px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cm" id="cmsg"></div>
+  <div class="c cib" style="border-radius:0">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div class="mw" style="flex-shrink:0">
+        <div class="pr" id="pC" style="display:none"><span></span><span></span><span></span></div>
+        <button class="msm" id="mC" onclick="togMic()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+      </div>
+      <input id="ci" placeholder="Pitaj me bilo sta..." onkeydown="if(event.key==='Enter')sndChat()" style="font-size:13px">
+      <button class="b" onclick="sndChat()" style="padding:11px 14px;color:var(--ac)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="b" id="acb" onclick="togAuto()" style="flex:1;padding:8px;font-size:11px;font-weight:700">AUTO</button>
+      <button class="b" onclick="setPer('normal')" style="flex:1;padding:8px;font-size:10px;font-weight:800">Normal</button>
+      <button class="b" onclick="setPer('pro')" style="flex:1;padding:8px;font-size:10px;font-weight:800">Pro</button>
+      <button class="b" onclick="setPer('sveznalica')" style="flex:1;padding:8px;font-size:10px;font-weight:800">Expert</button>
+      <button class="b" onclick="setPer('saljivi')" style="flex:1;padding:8px;font-size:10px;font-weight:800">Fun</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="pnl" id="sp" style="display:none">
+  <div class="ph c" style="border-radius:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="ib">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:900">Podesavanja</div>
+    </div>
+    <button class="b" onclick="togSet()" style="padding:8px 13px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px">
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Kljuc
+      </div>
+      <input type="password" id="aki" placeholder="sk-ant-..." style="margin-bottom:8px;font-family:monospace;font-size:12px">
+      <button class="b" onclick="saveKey()" style="width:100%;padding:9px;font-size:12px;font-weight:700;color:var(--ac)">Sacuvaj Kljuc</button>
+      <div id="kst" style="font-size:11px;color:var(--tx2);margin-top:6px;text-align:center"></div>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Ime
+      </div>
+      <div style="display:flex;gap:8px">
+        <input id="uname-inp" placeholder="Tvoje ime..." style="font-size:13px">
+        <button class="b" onclick="saveName()" style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--ac)">OK</button>
+      </div>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        Tema
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="b" onclick="setTh('light')" style="padding:10px;font-size:11px;font-weight:700">Svetla</button>
+        <button class="b" onclick="setTh('dark')" style="padding:10px;font-size:11px;font-weight:700">Tamna</button>
+        <button class="b" onclick="setTh('blue')" style="padding:10px;font-size:11px;font-weight:700">Plava</button>
+        <button class="b" onclick="setTh('green')" style="padding:10px;font-size:11px;font-weight:700">Zelena</button>
+        <button class="b" onclick="setTh('purple')" style="padding:10px;font-size:11px;font-weight:700">Ljubic.</button>
+        <button class="b" onclick="setTh('black')" style="padding:10px;font-size:11px;font-weight:700">Crna</button>
+      </div>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 12 h8 M12 8 v8"/></svg>
+        Boja akcenta
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="ac-swatches"></div>
+      <input type="color" id="ac-custom" value="#00c8b4" onchange="setAC(this.value)">
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        3D Efekat
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)"><span>Visina senke</span><span id="v-shxy">6px</span></div>
+        <input type="range" min="1" max="20" value="6" id="sl-shxy" oninput="upd3D()">
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)"><span>Sirina zamucenja</span><span id="v-shb">14px</span></div>
+        <input type="range" min="2" max="40" value="14" id="sl-shb" oninput="upd3D()">
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)">Tamna senka</div>
+        <input type="color" id="sl-dark" value="#b8c5d0" oninput="upd3D()">
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)">Svetla senka</div>
+        <input type="color" id="sl-light" value="#ffffff" oninput="upd3D()">
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)"><span>Zaobljenost kartica</span><span id="v-r">18px</span></div>
+        <input type="range" min="4" max="36" value="18" id="sl-r" oninput="upd3D()">
+      </div>
+      <div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--tx2)"><span>Zaobljenost polja</span><span id="v-r2">12px</span></div>
+        <input type="range" min="2" max="28" value="12" id="sl-r2" oninput="upd3D()">
+      </div>
+      <button class="b" onclick="reset3D()" style="width:100%;padding:9px;font-size:12px;font-weight:700;color:#ff6666">Resetuj 3D</button>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        Jacina glasa
+      </div>
+      <input type="range" min="0" max="100" value="80" id="vr" oninput="updVol(this)" style="margin-bottom:6px">
+      <div style="text-align:center;font-size:12px;color:var(--tx2)" id="vv">80%</div>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8" cy="11" r="2"/><circle cx="16" cy="11" r="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        AI Mod
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="b" onclick="setPer('normal')" style="padding:10px;font-size:12px;font-weight:700">Normal</button>
+        <button class="b" onclick="setPer('pro')" style="padding:10px;font-size:12px;font-weight:700">Pro</button>
+        <button class="b" onclick="setPer('sveznalica')" style="padding:10px;font-size:12px;font-weight:700">Sveznalica</button>
+        <button class="b" onclick="setPer('saljivi')" style="padding:10px;font-size:12px;font-weight:700">Saljivi</button>
+      </div>
+    </div>
+
+    <div class="c sec" style="margin-bottom:12px">
+      <div class="st" style="color:var(--ac)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Podaci
+      </div>
+      <button class="b" onclick="exportData()" style="width:100%;padding:9px;font-size:12px;font-weight:700;color:var(--ac);margin-bottom:8px">Izvezi podatke</button>
+      <button class="b" onclick="clearData()" style="width:100%;padding:9px;font-size:12px;font-weight:700;color:#ff6666">Obrisi sve</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PC={normal:"#00c8b4",pro:"#6ab4ff",sveznalica:"#ffb347",saljivi:"#ff7eb3"};
+const SYS={normal:"Ti si ljubazan AI asistent koji govori srpski. Odgovaraj kratko i korisno.",pro:"Ti si profesionalni AI ekspert koji govori srpski. Davaj precizne, detaljne odgovore.",sveznalica:"Ti si sveznalica koji govori srpski. Odgovaraj opširno sa zanimljivim detaljima.",saljivi:"Ti si duhoviti AI komičar koji govori srpski. Uvek dodaš šalu ali budi koristan."};
+const EVCOL=["#00c8b4","#6ab4ff","#ffb347","#ff7eb3","#b47eff"];
+const THEMES={light:{bg:"#e8edf3",tx:"#2a3a4a",dark:"#b8c5d0",light:"#ffffff"},dark:{bg:"#1a2030",tx:"#e0eaf5",dark:"#0d1118",light:"#252f42"},blue:{bg:"#dce8f5",tx:"#1a3050",dark:"#a8c0d8",light:"#f0f8ff"},green:{bg:"#dceee0",tx:"#1a3520",dark:"#a8c8b0",light:"#f0fff4"},purple:{bg:"#e8dff5",tx:"#2a1a40",dark:"#c0b0d8",light:"#f8f0ff"},black:{bg:"#111318",tx:"#d0d8e8",dark:"#080a0e",light:"#1e2230"}};
+const AC_SW=["#00c8b4","#6ab4ff","#ffb347","#ff7eb3","#b47eff","#ff6644","#44cc66","#ff4444"];
+function loadS(){try{return JSON.parse(localStorage.getItem("ai_s")||"{}");}catch{return {};}}
+function saveS(){try{localStorage.setItem("ai_s",JSON.stringify(S));}catch(e){}}
+const DEF={tab:"pregled",auto:false,per:"normal",theme:"light",ac:"#00c8b4",msgs:[],ch:[{r:"a",t:"Zdravo! Sve se cuva lokalno. Kako mogu pomoci?"}],notes:[{id:1,title:"Shopping lista",items:["Hleb","Mleko","Jaja"]},{id:2,title:"Ideje",items:["Plan A","Plan B"]}],alarms:[{id:1,label:"Jutarnji",time:"07:00",active:true,fired:false,rep:"none"},{id:2,label:"Trening",time:"18:30",active:true,fired:false,rep:"none"}],events:[{id:1,title:"Sastanak",time:"14:00",date:"",color:"#00c8b4",loc:""},{id:2,title:"Paket",time:"15:30",date:"",color:"#6ab4ff",loc:""}],todos:[{id:1,text:"Zavrsi izvestaj",done:false},{id:2,text:"Kupi mleko",done:false}],key:"",uname:"Sasa",vol:80,s3d:{shxy:6,shb:14,dark:"#b8c5d0",light:"#ffffff",r:18,r2:12}};
+let S=Object.assign({},DEF,loadS());S.lis=false;S.spk=false;S.thk=false;
+
+window.addEventListener("online",()=>document.getElementById("offbadge").style.display="none");
+window.addEventListener("offline",()=>document.getElementById("offbadge").style.display="block");
+if(!navigator.onLine)document.getElementById("offbadge").style.display="block";
+
+function updClk(){const n=new Date();document.getElementById("clk").textContent=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");document.getElementById("dbar").textContent=n.toLocaleDateString("sr-RS",{weekday:"long",day:"numeric",month:"long"});}
+setInterval(updClk,1000);updClk();
+
+setInterval(()=>{const n=new Date(),day=n.getDay();S.alarms.forEach(a=>{if(!a.active)return;if(a.rep==="none"&&a.fired)return;if(a.rep==="weekdays"&&(day===0||day===6))return;if(a.rep==="weekend"&&day>0&&day<6)return;const[h,m]=a.time.split(":").map(Number);if(n.getHours()===h&&n.getMinutes()===m&&n.getSeconds()<5){if(a.rep==="none")a.fired=true;spk(a.label+". Vreme je!");rAll();saveS();}});},2000);
+
+function sw(t){S.tab=t;["pregled","beleske","alarmi","termini"].forEach(x=>{const el=document.getElementById("t"+x[0]);if(el)el.style.display=x===t?"block":"none";});document.querySelectorAll(".tb").forEach(b=>{b.classList.toggle("on",b.dataset.t===t);b.style.color=b.classList.contains("on")?S.ac:"";});rAll();}
+document.querySelectorAll(".tb").forEach(b=>b.addEventListener("click",()=>sw(b.dataset.t)));
+
+function rAll(){rNW();rAW();rEMi();rTL();rTD();rNF();rAF();rEF();}
+
+// SVG templates
+const SVG_NOTE=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+const SVG_BELL=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+const SVG_CAL=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+const SVG_PIN=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`;
+function svg(t,c){return t.replace(/COLOR/g,c||"var(--ac)");}
+function ib(s,bg){return `<div class="ib" style="background:${bg||"var(--bg)"}">${s}</div>`;}
+
+function rNW(){const el=document.getElementById("nw");if(!el)return;el.innerHTML=S.notes.map(n=>`<div class="i ri">${ib(svg(SVG_NOTE,S.ac))}<span style="font-size:11px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n.title)}</span><div class="bdg">${n.items.length}</div></div>`).join("");}
+function rAW(){const el=document.getElementById("aw");if(!el)return;el.innerHTML=S.alarms.filter(a=>a.active).slice(0,3).map(a=>`<div class="i ri" style="margin-bottom:5px">${ib(svg(SVG_BELL,a.fired&&a.rep==="none"?"#aaa":S.ac))}<div style="flex:1"><div style="font-size:11px;font-weight:700">${esc(a.label)}</div><div style="font-size:10px;color:var(--tx2)">${a.time}</div></div></div>`).join("");}
+function rEMi(){const el=document.getElementById("emi");if(!el)return;el.innerHTML=S.events.slice(0,2).map(e=>`<div class="i ri" style="margin-bottom:5px">${ib(svg(SVG_CAL,e.color))}<span style="font-size:11px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.title)}</span><div class="tg" style="background:${e.color}">${e.time}</div></div>`).join("");}
+function rTL(){const el=document.getElementById("tl");if(!el)return;el.innerHTML=[...S.events].sort((a,b)=>a.time.localeCompare(b.time)).map(e=>`<div class="i tli" style="border-left-color:${e.color};margin-bottom:4px"><div style="font-size:10px;font-weight:800;color:${e.color}">${e.time}</div><div style="font-size:11px;font-weight:600">${esc(e.title)}</div></div>`).join("");}
+function rTD(){const el=document.getElementById("tdl");if(!el)return;el.innerHTML=S.todos.map(t=>`<div class="i ri" onclick="togTd(${t.id})" style="cursor:pointer;margin-bottom:5px"><div style="width:18px;height:18px;border-radius:50%;border:2px solid ${t.done?S.ac:"#bbb"};background:${t.done?S.ac:"transparent"};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:7px;transition:all .2s">${t.done?`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`:""}</div><span style="font-size:11px;font-weight:600;${t.done?"text-decoration:line-through;opacity:.4":""}">${esc(t.text)}</span></div>`).join("");}
+function rNF(){const el=document.getElementById("nf");if(!el)return;el.innerHTML=S.notes.map(n=>`<div class="c sec" style="margin-bottom:10px;animation:si .3s ease"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px">${ib(svg(SVG_NOTE,S.ac))}<span style="font-size:14px;font-weight:800">${esc(n.title)}</span></div><button class="b" onclick="delN(${n.id})" style="padding:5px 10px;color:#ff6666"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div><div style="display:flex;flex-wrap:wrap;gap:5px">${n.items.map(i=>`<span class="i" style="padding:4px 10px;font-size:11px;font-weight:600">${esc(i)}</span>`).join("")}</div></div>`).join("");}
+function rAF(){const el=document.getElementById("af");if(!el)return;el.innerHTML=S.alarms.map(a=>`<div class="c" style="padding:12px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px;flex:1">${ib(svg(SVG_BELL,a.active?S.ac:"#aaa"))}<div><div style="font-size:14px;font-weight:800">${esc(a.label)}</div><div style="font-size:12px;color:${S.ac};font-weight:700">${a.time} · ${a.rep}</div></div></div><div style="display:flex;gap:8px;align-items:center"><div class="tgl" style="background:${a.active?"linear-gradient(90deg,"+S.ac+",#00a896)":"#ccc"}" onclick="togAl(${a.id})"><div class="tgl-k" style="left:${a.active?"21px":"3px"}"></div></div><button class="b" onclick="delA(${a.id})" style="padding:5px 10px;color:#ff6666"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></div>`).join("");}
+function rEF(){const el=document.getElementById("ef");if(!el)return;el.innerHTML=[...S.events].sort((a,b)=>a.time.localeCompare(b.time)).map(e=>`<div class="c" style="padding:12px 13px;margin-bottom:8px;border-left:4px solid ${e.color}"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="display:flex;align-items:center;gap:6px">${ib(svg(SVG_CAL,e.color))}<span style="font-size:14px;font-weight:800">${esc(e.title)}</span></div><div style="font-size:12px;color:${e.color};font-weight:700;margin-top:2px">${e.time}${e.date?" · "+e.date:""}</div>${e.loc?`<div style="font-size:10px;color:var(--tx2);margin-top:2px">${svg(SVG_PIN,e.color)} ${esc(e.loc)}</div>`:""}</div><button class="b" onclick="delE(${e.id})" style="padding:5px 10px;color:#ff6666"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></div>`).join("");}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function addN(){const t=document.getElementById("nt").value.trim(),its=document.getElementById("ni").value.split("\n").filter(Boolean);if(!t)return;S.notes.push({id:Date.now(),title:t,items:its});document.getElementById("nt").value="";document.getElementById("ni").value="";rAll();saveS();}
+function delN(id){S.notes=S.notes.filter(n=>n.id!==id);rAll();saveS();}
+function addA(){const l=document.getElementById("al").value.trim(),t=document.getElementById("at").value,rep=document.getElementById("arep").value;if(!l||!t)return;S.alarms.push({id:Date.now(),label:l,time:t,active:true,fired:false,rep});document.getElementById("al").value="";document.getElementById("at").value="";rAll();saveS();}
+function delA(id){S.alarms=S.alarms.filter(a=>a.id!==id);rAll();saveS();}
+function togAl(id){const a=S.alarms.find(x=>x.id===id);if(a){a.active=!a.active;a.fired=false;}rAll();saveS();}
+function addEv(){const t=document.getElementById("et").value.trim(),tm=document.getElementById("etm").value,d=document.getElementById("ed").value,loc=document.getElementById("eloc").value.trim();if(!t||!tm)return;S.events.push({id:Date.now(),title:t,time:tm,date:d,color:EVCOL[Math.floor(Math.random()*EVCOL.length)],loc});document.getElementById("et").value="";document.getElementById("etm").value="";document.getElementById("ed").value="";document.getElementById("eloc").value="";rAll();saveS();}
+function delE(id){S.events=S.events.filter(e=>e.id!==id);rAll();saveS();}
+function addTd(){const t=document.getElementById("tdi").value.trim();if(!t)return;S.todos.push({id:Date.now(),text:t,done:false});document.getElementById("tdi").value="";rTD();saveS();}
+function togTd(id){const t=S.todos.find(x=>x.id===id);if(t)t.done=!t.done;rTD();saveS();}
+document.getElementById("tdi").addEventListener("keydown",e=>{if(e.key==="Enter")addTd();});
+
+let voices=[];speechSynthesis.onvoiceschanged=()=>{voices=speechSynthesis.getVoices();};
+function spk(txt){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="sr-RS";u.rate=0.92;u.pitch=1.05;u.volume=S.vol/100;const v=voices.find(x=>x.lang.startsWith("sr")||x.lang.startsWith("hr")||x.lang.startsWith("bs"));if(v)u.voice=v;u.onstart=()=>{S.spk=true;updMic();showSt("AI govori...");};u.onend=()=>{S.spk=false;updMic();hideSt();if(S.auto&&!S.lis)setTimeout(startLis,600);};speechSynthesis.speak(u);}
+
+let rec=null;
+function startLis(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showAiTxt("Koristite Chrome za govor.");return;}rec=new SR();rec.lang="sr-RS";rec.interimResults=true;let ft="";rec.onstart=()=>{S.lis=true;ft="";updMic();showSt("Slusam...");};rec.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join("");showAiTxt('"'+t+'"');if(e.results[e.results.length-1].isFinal)ft=t;};rec.onerror=()=>{S.lis=false;updMic();hideSt();};rec.onend=()=>{S.lis=false;updMic();hideSt();if(ft.trim().length>1)hdlSpch(ft.trim());else if(S.auto)setTimeout(startLis,800);};rec.start();}
+function stopLis(){rec?.stop();S.lis=false;updMic();hideSt();}
+function togMic(){S.lis?stopLis():startLis();}
+
+async function hdlSpch(txt){
+  const tl=txt.toLowerCase();
+  if(/podseti|alarm|probudi|za\s+\d+\s+minut|za\s+\d+\s+sat/.test(tl)){const p=parseAlarm(txt);if(p){S.alarms.push({id:Date.now(),label:p.label||"Podsetnik",time:p.time,active:true,fired:false,rep:"none"});const r="Alarm postavljen za "+p.time+"!";addMsg("a",r);showAiTxt(r);spk(r);rAll();saveS();return;}}
+  if(/koliko je sati|koje je vreme/.test(tl)){const n=new Date();const r="Sada je "+n.getHours()+" sati i "+n.getMinutes()+" minuta.";addMsg("a",r);showAiTxt(r);spk(r);return;}
+  if(/koji je datum|koji dan/.test(tl)){const r="Danas je "+new Date().toLocaleDateString("sr-RS",{weekday:"long",day:"numeric",month:"long",year:"numeric"});addMsg("a",r);showAiTxt(r);spk(r);return;}
+  if(!S.key){const r="Nemam API kljuc. Idi u Podesavanja.";addMsg("a",r);showAiTxt(r);spk(r);return;}
+  addMsg("u",txt);S.msgs.push({role:"user",content:txt});S.thk=true;showSt("AI razmislja...");showAiTxt("AI razmislja...");addDots();
+  try{const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":S.key,"anthropic-version":"2023-06-01"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:SYS[S.per],messages:S.msgs.slice(-20)})});const d=await res.json();const r=d.content?.[0]?.text||"Nisam razumeo.";S.msgs.push({role:"assistant",content:r});S.thk=false;hideSt();addMsg("a",r);showAiTxt(r);spk(r);saveS();}
+  catch(e){S.thk=false;hideSt();const er=navigator.onLine?"Greska.":"Nema interneta.";addMsg("a",er);showAiTxt(er);}
+}
+function parseAlarm(txt){const n=new Date();const mm=txt.match(/za\s+(\d+)\s+minut/i);if(mm){const t=new Date(n.getTime()+parseInt(mm[1])*60000);return{time:String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"),label:"Podsetnik"};}const hm=txt.match(/za\s+(\d+)\s+sat/i);if(hm){const t=new Date(n.getTime()+parseInt(hm[1])*3600000);return{time:String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"),label:"Podsetnik"};}const tm=txt.match(/(\d{1,2})[:\s](\d{2})/);if(tm)return{time:String(tm[1]).padStart(2,"0")+":"+tm[2],label:txt};return null;}
+
+function addMsg(r,t){S.ch.push({r,t});const el=document.getElementById("cmsg");if(!el)return;const dots=el.querySelector(".dots");if(dots)dots.remove();const d=document.createElement("div");d.className="msg "+r;d.textContent=t;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function addDots(){const el=document.getElementById("cmsg");if(!el)return;const d=document.createElement("div");d.className="dots";d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function sndChat(){const inp=document.getElementById("ci");if(!inp)return;const t=inp.value.trim();if(!t)return;inp.value="";hdlSpch(t);}
+function rChatHist(){const el=document.getElementById("cmsg");if(!el)return;el.innerHTML=S.ch.slice(-50).map(m=>`<div class="msg ${m.r}">${esc(m.t)}</div>`).join("");el.scrollTop=el.scrollHeight;}
+
+function updMic(){const on=S.lis;["mM","mm","mC"].forEach(id=>{const el=document.getElementById(id);if(el)el.className=(id==="mM"?"mbig ":"msm ")+(on?"on":"");});["pM","pm","pC"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=on?"block":"none";});const lb=document.getElementById("mml");if(lb){lb.textContent=on?"Slusam...":"Pritisni za govor";lb.style.color=on?S.ac:"var(--tx2)";}const ms=document.getElementById("mic-svg");if(ms)ms.setAttribute("stroke",on?"#fff":"var(--ac)");}
+function showAiTxt(t){const el=document.getElementById("aibox");if(el)el.textContent=t;}
+function showSt(t){const el=document.getElementById("sb"),tx=document.getElementById("st2");if(el)el.classList.add("show");if(tx)tx.textContent=t;buildWave(true);}
+function hideSt(){const el=document.getElementById("sb");if(el)el.classList.remove("show");buildWave(false);}
+function buildWave(on){const el=document.getElementById("ws");if(!el)return;const hs=[12,20,28,22,18,26,14];el.innerHTML=hs.map((h,i)=>`<div class="wb" style="height:${on?h:4}px;transition:height .12s ease ${i*.05}s"></div>`).join("");}
+
+function togChat(){const el=document.getElementById("cp"),vis=el.style.display==="none"||!el.style.display;el.style.display=vis?"flex":"none";if(vis){rChatHist();updCSub();}document.getElementById("cfab").style.color=vis?S.ac:"var(--tx)";}
+function togSet(){const el=document.getElementById("sp"),vis=el.style.display==="none"||!el.style.display;el.style.display=vis?"flex":"none";if(vis)loadSetUI();}
+function clPnl(){document.getElementById("cp").style.display="none";document.getElementById("sp").style.display="none";}
+function updCSub(){const el=document.getElementById("csub");if(el)el.textContent=S.per+" · "+(S.auto?"Auto ON":"Manual");}
+
+function togAuto(){S.auto=!S.auto;const f=document.getElementById("afab"),cb=document.getElementById("acb"),as=document.getElementById("auto-svg");if(f)f.style.color=S.auto?S.ac:"var(--tx)";if(as)as.setAttribute("stroke",S.auto?S.ac:"currentColor");if(cb){cb.textContent=S.auto?"STOP":"AUTO";cb.style.color=S.auto?S.ac:"";}if(S.auto)setTimeout(startLis,300);else stopLis();updCSub();saveS();}
+function setPer(p){S.per=p;updCSub();saveS();}
+function setTh(t){S.theme=t;const th=THEMES[t]||THEMES.light;document.documentElement.style.setProperty("--bg",th.bg);document.documentElement.style.setProperty("--tx",th.tx);document.documentElement.style.setProperty("--tx2",th.tx+"55");if(!S.s3d||S.s3d.dark==="#b8c5d0"){document.documentElement.style.setProperty("--sh-dark",th.dark);document.documentElement.style.setProperty("--sh-light",th.light);}document.getElementById("themeColor").content=th.bg;saveS();}
+function setAC(c){S.ac=c;document.documentElement.style.setProperty("--ac",c);document.querySelectorAll(".tb.on").forEach(b=>b.style.color=c);buildSwatches();saveS();rAll();}
+function buildSwatches(){const el=document.getElementById("ac-swatches");if(!el)return;el.innerHTML=AC_SW.map(c=>`<div class="sw" onclick="setAC('${c}')" style="background:${c};border-color:${S.ac===c?"var(--tx)":"transparent"}"></div>`).join("");}
+
+function upd3D(){const shxy=parseInt(document.getElementById("sl-shxy").value),shb=parseInt(document.getElementById("sl-shb").value),dark=document.getElementById("sl-dark").value,light=document.getElementById("sl-light").value,r=parseInt(document.getElementById("sl-r").value),r2=parseInt(document.getElementById("sl-r2").value);S.s3d={shxy,shb,dark,light,r,r2};document.documentElement.style.setProperty("--sh-x",shxy+"px");document.documentElement.style.setProperty("--sh-y",shxy+"px");document.documentElement.style.setProperty("--sh-b",shb+"px");document.documentElement.style.setProperty("--sh-dark",dark);document.documentElement.style.setProperty("--sh-light",light);document.documentElement.style.setProperty("--r",r+"px");document.documentElement.style.setProperty("--r2",r2+"px");document.getElementById("v-shxy").textContent=shxy+"px";document.getElementById("v-shb").textContent=shb+"px";document.getElementById("v-r").textContent=r+"px";document.getElementById("v-r2").textContent=r2+"px";const upR=(id,mn,mx,v)=>{const e=document.getElementById(id);if(e)e.style.setProperty("--val",((v-mn)/(mx-mn)*100).toFixed(1)+"%");};upR("sl-shxy",1,20,shxy);upR("sl-shb",2,40,shb);upR("sl-r",4,36,r);upR("sl-r2",2,28,r2);saveS();}
+function reset3D(){S.s3d={shxy:6,shb:14,dark:"#b8c5d0",light:"#ffffff",r:18,r2:12};loadSetUI();upd3D();}
+function loadSetUI(){const d=S.s3d||{};const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};set("sl-shxy",d.shxy||6);set("sl-shb",d.shb||14);set("sl-dark",d.dark||"#b8c5d0");set("sl-light",d.light||"#ffffff");set("sl-r",d.r||18);set("sl-r2",d.r2||12);set("aki",S.key||"");set("uname-inp",S.uname||"");set("vr",S.vol||80);document.getElementById("vv").textContent=(S.vol||80)+"%";set("ac-custom",S.ac||"#00c8b4");buildSwatches();upd3D();}
+function saveKey(){const v=document.getElementById("aki")?.value?.trim();if(!v)return;S.key=v;saveS();const s=document.getElementById("kst");if(s){s.textContent="Kljuc sacuvan!";s.style.color="#00c8b4";}}
+function saveName(){const v=document.getElementById("uname-inp")?.value?.trim();if(!v)return;S.uname=v;document.getElementById("uname-lbl").textContent=v;saveS();}
+function updVol(el){S.vol=parseInt(el.value);document.getElementById("vv").textContent=S.vol+"%";el.style.setProperty("--val",S.vol+"%");saveS();}
+function exportData(){const data=JSON.stringify({notes:S.notes,alarms:S.alarms,events:S.events,todos:S.todos},null,2);const blob=new Blob([data],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="podaci.json";a.click();}
+function clearData(){S.notes=[];S.alarms=[];S.events=[];S.todos=[];S.msgs=[];S.ch=[{r:"a",t:"Podaci obrisani."}];saveS();rAll();const s=document.getElementById("kst");if(s){s.textContent="Obrisano!";s.style.color="#ff6644";}}
+
+function init(){const d=S.s3d||{};document.documentElement.style.setProperty("--sh-x",(d.shxy||6)+"px");document.documentElement.style.setProperty("--sh-y",(d.shxy||6)+"px");document.documentElement.style.setProperty("--sh-b",(d.shb||14)+"px");document.documentElement.style.setProperty("--sh-dark",d.dark||"#b8c5d0");document.documentElement.style.setProperty("--sh-light",d.light||"#ffffff");document.documentElement.style.setProperty("--r",(d.r||18)+"px");document.documentElement.style.setProperty("--r2",(d.r2||12)+"px");document.documentElement.style.setProperty("--ac",S.ac||"#00c8b4");setTh(S.theme||"light");document.getElementById("uname-lbl").textContent=S.uname||"Sasa";rAll();sw("pregled");}
+init();
+</script>
+</body>
+</html>
